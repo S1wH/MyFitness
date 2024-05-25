@@ -1,11 +1,14 @@
 from django.urls import path
 from rest_framework import routers
-from . import views
+from .views import CoachViewSet
 
 
 router = routers.DefaultRouter()
-urlpatterns = [
+router.register('coaches', CoachViewSet)
 
+app_name = 'users_app'
+
+urlpatterns = [
 ]
 
-urls = router.urls
+urlpatterns += router.urls
