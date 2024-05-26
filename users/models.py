@@ -14,6 +14,9 @@ class Coach(models.Model):
     class Meta:
         verbose_name = 'Coache'
 
+    def __str__(self):
+        return f'Coach {self.user.name} with {self.experience} experience years'
+
 
 class Client(models.Model):
     LEVEL_NEWBIE = 'Нет опыта'
@@ -33,5 +36,9 @@ class Client(models.Model):
     weight = models.IntegerField()
     level = models.CharField(max_length=50, choices=LEVEL_CHOICES, default=LEVEL_NEWBIE)
     contraindications = models.TextField(verbose_name='contraindications', blank=True, null=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    tariff = models.ForeignKey(Tariff, on_delete=models.SET_NULL, default=None, blank=True, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='client')
+    tariff = models.ForeignKey(Tariff, on_delete=models.SET_NULL, default=None, blank=True, null=True,
+                               related_name='clients')
+
+    def __str__(self):
+        return f'Client {self.user.name}'
