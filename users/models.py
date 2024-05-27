@@ -23,7 +23,6 @@ class Client(models.Model):
     LEVEL_BEGINNER = 'Начинающий уровень (до 1 года опыта)'
     LEVEL_INTERMEDIATE = 'Средний уровень (от 1 до 3 лет опыта)'
     LEVEL_ADVANCED = 'Продвинутый уровень (более 3 лет опыта)'
-
     LEVEL_CHOICES = [
         (LEVEL_NEWBIE, 'Нет опыта'),
         (LEVEL_BEGINNER, 'Начинающий уровень (до 1 года опыта)'),
@@ -31,6 +30,14 @@ class Client(models.Model):
         (LEVEL_ADVANCED, 'Продвинутый уровень (более 3 лет опыта)'),
     ]
 
+    SEX_MALE = 'Мужской'
+    SEX_FEMALE = 'Женский'
+    SEX_CHOICES = [
+        (SEX_MALE, 'Мужской'),
+        (SEX_FEMALE, 'Женский'),
+    ]
+
+    sex = models.CharField(max_length=50, choices=SEX_CHOICES)
     birthday = models.DateField()
     height = models.IntegerField()
     weight = models.IntegerField()
