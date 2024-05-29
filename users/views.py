@@ -1,4 +1,6 @@
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, viewsets, generics, mixins, views
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
@@ -6,8 +8,9 @@ from rest_framework.authtoken.models import Token
 from .models import Coach, Client, ActivationCode, User
 from .serializer import CoachSerializer, ClientSerializer, UserSerializer
 from .permissions import CreateOnly
-from .utils import create_user, send_mail
-# from myfitness.celery import send_mail
+from .utils import create_user
+from .swagger_params import code_param
+from myfitness.celery import send_mail
 
 
 # class CoachViewSet(viewsets.ModelViewSet):
@@ -61,14 +64,14 @@ class UserViewSet(mixins.CreateModelMixin,
 
     def create(self, request, *args, **kwargs):
         try:
-            serializer = self.get_serializer()
+            serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             user = User.objects.get(email=request.data['email'])
             return_data = serializer.data
             return_data.update({"token": Token.objects.get(user=user).key})
             code = ActivationCode.objects.create(user=user)
-            send_mail(user.id, code.code)
+            send_mail.delay(user.id, code.code)
             return Response(return_data, status=status.HTTP_201_CREATED)
         except ValidationError as e:
             return Response(repr(e), status=status.HTTP_400_BAD_REQUEST)
@@ -77,6 +80,14 @@ class UserViewSet(mixins.CreateModelMixin,
 class EmailVerificationView(views.APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(operation_description="verification for user with email code", responses={400: ''},
+                         request_body=openapi.Schema(
+                             type=openapi.TYPE_OBJECT,
+                             required=['code'],
+                             properties={
+                                 'code': openapi.Schema(type=openapi.TYPE_STRING)
+                             },
+                         ))
     def post(self, request):
         code = request.data.get('code', None)
         if not code:
@@ -95,4 +106,4 @@ class EmailVerificationView(views.APIView):
             user_code.delete()
         except ObjectDoesNotExist as e:
             return Response(repr(e), status=status.HTTP_400_BAD_REQUEST)
-        return Response('Верификация успешно пройдена', status=status.HTTP_200_OK)
+        return Response({'code': code}, status=status.HTTP_200_OK)
