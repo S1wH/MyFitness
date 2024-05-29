@@ -11,6 +11,7 @@
 ### Запуск
 
 - Запуск производится командой `python manage.py runserver`
+- celery -A myfitness worker -l info --pool=solo
 
 
 ### Авторизация
