@@ -11,7 +11,8 @@
 ### Запуск
 
 - Запуск производится командой `python manage.py runserver`
-- celery -A myfitness worker -l info --pool=solo
+- Запуск celery `celery -A myfitness worker -l info --pool=solo`
+- Запуск redis `cd redis` `start redis-server`
 
 
 ### Авторизация
