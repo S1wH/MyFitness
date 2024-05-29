@@ -1,7 +1,26 @@
-from django.contrib.auth.models import User
+import string
+import random
+from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator
 from django.db import models
 from fitness_app.models import Tariff
+
+
+def generate_activation_code() -> str:
+    return ''.join(random.choice(string.digits) for _ in range(6))
+
+
+class User(AbstractUser):
+    email = models.EmailField(unique=True, blank=False, null=False)
+    is_verified = models.BooleanField(default=False)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
+
+
+class ActivationCode(models.Model):
+    user = models.OneToOneField(User, on_delete=models.PROTECT, related_name='user_code')
+    code = models.CharField(max_length=6, default=generate_activation_code)
 
 
 class Coach(models.Model):

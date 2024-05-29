@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Tariff
+from .models import Tariff, MuscleGroup, Exercise
 
-# Register your models here.
+
 admin.site.register(Tariff)
+admin.site.register(MuscleGroup)
+admin.site.register(Exercise)
