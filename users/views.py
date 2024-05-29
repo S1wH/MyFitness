@@ -9,7 +9,6 @@ from .models import Coach, Client, ActivationCode, User
 from .serializer import CoachSerializer, ClientSerializer, UserSerializer
 from .permissions import CreateOnly
 from .utils import create_user
-from .swagger_params import code_param
 from myfitness.celery import send_mail
 
 
