@@ -1,11 +1,15 @@
 from django.urls import path
 from rest_framework import routers
-from . import views
+from .views import UserViewSet, EmailVerificationView
 
 
 router = routers.DefaultRouter()
-urlpatterns = [
+router.register('users', UserViewSet)
 
+app_name = 'users_app'
+
+urlpatterns = [
+    path('verify_email/', EmailVerificationView.as_view(), name='verify-email'),
 ]
 
-urls = router.urls
+urlpatterns += router.urls
