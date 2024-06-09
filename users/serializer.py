@@ -10,6 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CoachSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
 
     class Meta:
         model = Coach
@@ -17,6 +18,7 @@ class CoachSerializer(serializers.ModelSerializer):
 
 
 class ClientSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
 
     class Meta:
         model = Client

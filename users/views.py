@@ -1,56 +1,63 @@
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import status, viewsets, generics, mixins, views
+from rest_framework import status, viewsets, mixins, views, permissions
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from .models import Coach, Client, ActivationCode, User
 from .serializer import CoachSerializer, ClientSerializer, UserSerializer
 from .permissions import CreateOnly
-from .utils import create_user
+from .utils import check_user
 from myfitness.celery import send_mail
 
 
-# class CoachViewSet(viewsets.ModelViewSet):
-#     queryset = Coach.objects.all()
-#     serializer_class = CoachSerializer
-#     permission_classes = [IsAuthenticated | CreateOnly]
-#
-#     def create(self, request, *args, **kwargs):
-#         try:
-#             user = create_user(request.data)
-#             request.data['user'] = user.id
-#             serializer = self.get_serializer(data=request.data)
-#             serializer.is_valid(raise_exception=True)
-#             self.perform_create(serializer)
-#             return_data = serializer.data
-#             return_data.update({"token": Token.objects.get(user=user).key})
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         except ValidationError as e:
-#             return Response(repr(e), status=status.HTTP_400_BAD_REQUEST)
+class CoachViewSet(viewsets.ModelViewSet):
+    queryset = Coach.objects.all()
+    serializer_class = CoachSerializer
+    permission_classes = [IsAuthenticated]
+
+    def destroy(self, request, *args, **kwargs):
+        if check_user(request.user, self.get_object().user):
+            super().destroy(request, *args, **kwargs)
+        return Response('Данный пользователь не имеет прав на удаление данного объекта',
+                        status=status.HTTP_406_NOT_ACCEPTABLE)
+
+    def update(self, request, *args, **kwargs):
+        if check_user(request.user, self.get_object().user):
+            super().update(request, *args, **kwargs)
+        return Response('Данный пользователь не имеет прав на обновление данного объекта',
+                        status=status.HTTP_406_NOT_ACCEPTABLE)
+
+    def partial_update(self, request, *args, **kwargs):
+        if check_user(request.user, self.get_object().user):
+            super().partial_update(request, *args, **kwargs)
+        return Response('Данный пользователь не имеет прав на частичное обновление данного объекта',
+                        status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
-# class ClientViewSet(viewsets.ModelViewSet):
-#     queryset = Client.objects.all()
-#     serializer_class = ClientSerializer
-#     permission_classes = [IsAuthenticated | CreateOnly]
-#
-#     def create(self, request, *args, **kwargs):
-#         try:
-#             # user = create_user(request.data)
-#             # request.data['user'] = user.id
-#             serializer = UserSerializer(data=request.data)
-#             serializer.is_valid(raise_exception=True)
-#             self.perform_create(serializer)
-#             user = User.objects.get(email=request.data['email'])
-#             return_data = serializer.data
-#             return_data.update({"token": Token.objects.get(user=user).key})
-#             code = ActivationCode.objects.create(user=user)
-#             send_mail(user.id, code.code)
-#             return Response(return_data, status=status.HTTP_201_CREATED)
-#         except ValidationError as e:
-#             return Response(repr(e), status=status.HTTP_400_BAD_REQUEST)
+class ClientViewSet(viewsets.ModelViewSet):
+    queryset = Client.objects.all()
+    serializer_class = ClientSerializer
+    permission_classes = [(IsAuthenticated & permissions.SAFE_METHODS) | IsAdminUser]
+
+    def destroy(self, request, *args, **kwargs):
+        if check_user(request.user, self.get_object().user):
+            super().destroy(request, *args, **kwargs)
+        return Response('Данный пользователь не имеет прав на удаление данного объекта',
+                        status=status.HTTP_406_NOT_ACCEPTABLE)
+
+    def update(self, request, *args, **kwargs):
+        if check_user(request.user, self.get_object().user):
+            super().update(request, *args, **kwargs)
+        return Response('Данный пользователь не имеет прав на обновление данного объекта',
+                        status=status.HTTP_406_NOT_ACCEPTABLE)
+
+    def partial_update(self, request, *args, **kwargs):
+        if check_user(request.user, self.get_object().user):
+            super().partial_update(request, *args, **kwargs)
+        return Response('Данный пользователь не имеет прав на частичное обновление данного объекта',
+                        status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
 class UserViewSet(mixins.CreateModelMixin,

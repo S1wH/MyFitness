@@ -17,6 +17,9 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
+    def __str__(self):
+        return f'User {self.first_name} {self.last_name}'
+
 
 class ActivationCode(models.Model):
     user = models.OneToOneField(User, on_delete=models.PROTECT, related_name='user_code')
@@ -34,7 +37,7 @@ class Coach(models.Model):
         verbose_name = 'Coache'
 
     def __str__(self):
-        return f'Coach {self.user.name} with {self.experience} experience years'
+        return f'Coach {self.user.first_name} {self.user.last_name} with {self.experience} experience years'
 
 
 class Client(models.Model):

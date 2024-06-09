@@ -1,5 +1,4 @@
 from django.core.exceptions import ValidationError
-from django.core import mail
 from .models import User
 
 
@@ -19,15 +18,5 @@ def create_user(data: dict) -> User:
     return User.objects.create(email=email, password=password, first_name=first_name, last_name=second_name)
 
 
-def send_mail(user_id: int, code: str) -> None:
-    with mail.get_connection() as connection:
-        user = User.objects.get(id=user_id)
-        email_body = (f'Здравствуйте {user.first_name} {user.last_name}!'
-                      f' Ваш код подтверждения для завершения регистрации: {code}')
-        mail.EmailMessage(
-            subject='Подтверждение регистрации',
-            body=email_body,
-            from_email='settings.EMAIL_HOST_USER',
-            to=[user.email],
-            connection=connection
-        ).send()
+def check_user(request_user: User, url_user: User) -> bool:
+    return request_user == url_user or request_user.is_superuser is True
