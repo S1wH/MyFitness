@@ -25,12 +25,14 @@ SECRET_KEY = 'django-insecure-wdu=58i0jy_a(4s4!)lt8yn8^bq=sjc=-nb=v#-9=fkjm=tch0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
     # my
     'fitness_app',
     'users',
+    'chat_app',
 ]
 
 MIDDLEWARE = [
@@ -174,3 +177,15 @@ EMAIL_HOST_PASSWORD = 'tbwl scqh zwjy ccvt'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+
+ASGI_APPLICATION = "myfitness.asgi.application"
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
+        },
+    },
+}

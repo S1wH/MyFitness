@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from .models import Coach, Client, ActivationCode, User
-from .serializer import CoachSerializer, ClientSerializer, UserSerializer
+from .serializers import CoachSerializer, ClientSerializer, UserSerializer
 from .permissions import CreateOnly
 from .utils import check_user
 from myfitness.celery import send_mail
