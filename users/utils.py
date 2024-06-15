@@ -1,3 +1,5 @@
+import random
+import string
 from django.core.exceptions import ValidationError
 from .models import User
 
@@ -20,3 +22,7 @@ def create_user(data: dict) -> User:
 
 def check_user(request_user: User, url_user: User) -> bool:
     return request_user == url_user or request_user.is_superuser is True
+
+
+def generate_password() -> str:
+    return ''.join(random.choice(string.digits + string.ascii_lowercase + string.ascii_uppercase) for _ in range(9))

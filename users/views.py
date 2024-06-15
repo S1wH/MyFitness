@@ -8,7 +8,7 @@ from rest_framework.authtoken.models import Token
 from .models import Coach, Client, ActivationCode, User
 from .serializers import CoachSerializer, ClientSerializer, UserSerializer
 from .permissions import CreateOnly
-from .utils import check_user
+from .utils import check_user, generate_password
 from myfitness.celery import send_mail
 
 
@@ -70,6 +70,8 @@ class UserViewSet(mixins.CreateModelMixin,
 
     def create(self, request, *args, **kwargs):
         try:
+            request.data['password'] = generate_password()
+            request.data['username'] = request.data['email']
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
